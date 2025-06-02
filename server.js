@@ -1,3 +1,6 @@
+// importa o cors
+const cors = require("cors");
+
 // importa o path
 const path = require("path");
 
@@ -16,14 +19,39 @@ const app = express();
 // define a porta
 const port = 3000;
 
+// usa o cors
+app.use(cors());
+
+// usa o json
+app.use(express.json());
+
+// instancia o supabase
+const { createClient } = require("@supabase/supabase-js");
+
+// conectar com o supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
 // rota raiz
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// rota para conectar com o supabase(para buscar os dados)
+// Rota para listar todas as tarefas
 app.get("/api/todos", async (req, res) => {
-  // faz a conexão com o supabase
+  try {
+    const { data, err } = await supabase
+      .from("todos")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (err) throw err;
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // escuta a porta
