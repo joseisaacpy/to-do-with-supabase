@@ -73,6 +73,30 @@ app.post("/api/todos", async (req, res) => {
   }
 });
 
+// rota para ver apenas uma tarefa pelo id
+app.get("/api/todos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase.from("todos").select("*").eq("id", id);
+
+  if (error) res.status(500).json({ error: error.message });
+  res.status(200).json(data);
+});
+
+// rota para atualizar o status de uma tarefa
+app.patch("/api/todos/:id", async (req, res) => {
+  const { id } = req.params;
+  const { done } = req.body;
+
+  const { data, error } = await supabase
+    .from("todos")
+    .update({ done }) // so atualiza o campo/col 'done'
+    .eq("id", id);
+
+  if (error) res.status(500).json({ error: error.message });
+  res.status(200).json(data);
+});
+
 // escuta a porta
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
