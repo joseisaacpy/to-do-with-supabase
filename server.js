@@ -42,15 +42,34 @@ app.get("/", (req, res) => {
 // Rota para listar todas as tarefas
 app.get("/api/todos", async (req, res) => {
   try {
-    const { data, err } = await supabase
+    const { data, error } = await supabase
       .from("todos")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (err) throw err;
+    if (error) throw error;
     res.status(200).json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Rota para adicionar uma tarefa no supabase
+app.post("/api/todos", async (req, res) => {
+  // pega o title vindo do corpo da requisição
+  const title = req.body.title;
+  // tentar fazer o insert no supabase
+  try {
+    const { data, error } = await supabase
+      .from("todos")
+      .insert([{ title, done: false }])
+      .select();
+
+    if (error) throw error;
+
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
