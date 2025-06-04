@@ -25,6 +25,9 @@ app.use(cors());
 // usa o json
 app.use(express.json());
 
+// para servir arquivos estaticos
+app.use("/", express.static(path.join(__dirname, "public")));
+
 // instancia o supabase
 const { createClient } = require("@supabase/supabase-js");
 
@@ -36,7 +39,7 @@ const supabase = createClient(
 
 // rota raiz
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.sendFile(path.join(__dirname, "public", "views", "index.html"));
 });
 
 // Rota para listar todas as tarefas
